@@ -365,6 +365,37 @@ int main()
 	// Create and open a window for the game
 	RenderWindow window(vm, "Chaos Arena", Style::Default);
 
+    //Creating Textures
+    Texture background_texture;
+    Texture wizard_texture;
+    Texture fireball_texture;
+
+    //Loading Graphics
+    background_texture.loadFromFile("Graphics/Sprite-0002-Unfinished-Pixel-Arena-1920-1080.png");
+    wizard_texture.loadFromFile("Graphics/Sprite-0001-32x-Wizard-Facing-Down.png");
+    fireball_texture.loadFromFile("Graphics/Sprite-0005-64x-Fireball.png");
+
+    //Creating Sprites
+    Sprite background_sprite;
+    Sprite wizard_sprite;
+    Sprite fireball_sprite;
+
+    //Attaching Textures To Sprites
+    background_sprite.setTexture(background_texture);
+    wizard_sprite.setTexture(wizard_texture);
+    fireball_sprite.setTexture(fireball_texture);
+
+    //Positioning Sprites
+    background_sprite.setPosition(0,0);
+    //Positioning the Wizard
+    FloatRect wizRect = wizard_sprite.getLocalBounds();
+    wizard_sprite.setOrigin(wizRect.left + wizRect.width / 2.0f, wizRect.top + wizRect.height / 2.0f);
+    wizard_sprite.setPosition(1920/2.0f, 1080/2.0f);
+    //Defining the origin of the fireball
+    FloatRect fireballRect = fireball_sprite.getLocalBounds();
+    fireball_sprite.setOrigin(fireballRect.left + fireballRect.width / 2.0f, fireballRect.top + fireballRect.height / 2.0f);
+
+
     Vector2f clicked;
 
     bool start = false;
@@ -372,6 +403,8 @@ int main()
     Vector2f center_screen;
     center_screen.x = 1920/2;
     center_screen.y = 1080/2;
+
+
 
     //Creating the attack class
     class Attack
@@ -390,7 +423,7 @@ int main()
         int damage = 1;
         int attack_counter = 0;
         int true_dead_attack_counter = 0;
-        int attack_travel_speed = 50;
+        int attack_travel_speed = 100;
 
         public:
         void attack_generator(int x_in,int y_in)
@@ -505,6 +538,10 @@ int main()
     instruction_text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
     instruction_text.setPosition(1920/2.0f, 1080/2.0f);
 
+    
+
+    
+
     //Positioning the point counter text
     kill_count_text.setPosition(30, 30);
 
@@ -593,6 +630,12 @@ int main()
         window.clear();
         // Draw our game scene here
 
+        //Drawing Background
+        window.draw(background_sprite);
+
+        //Drawing Player Character
+        window.draw(wizard_sprite);
+
         //Drawing Point Counter
         window.draw(kill_count_text);
 
@@ -606,10 +649,8 @@ int main()
         {
             if(fireball.is_dead_atk(i) != true)
             {
-                RectangleShape rect(Vector2f(7,7));
-                rect.setPosition(Vector2f(fireball.return_x_pos(i), fireball.return_y_pos(i)));
-                rect.setFillColor(Color::Red);
-                window.draw(rect);
+                fireball_sprite.setPosition(Vector2f(fireball.return_x_pos(i), fireball.return_y_pos(i)));
+                window.draw(fireball_sprite);
             }
         }
         
