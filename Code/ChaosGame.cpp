@@ -6,6 +6,8 @@ using namespace sf;
 #include <sstream>
 using namespace std;
 
+/*
+
 //Now a Cool Project!!!
 
 int main()
@@ -123,6 +125,7 @@ int main()
         ///Vector2f v(2,2);
         ///RectangleShape rect(v);
         
+        /*
         //Starting the program only when the player adds the first point
         if(points.size() > 0)
         {
@@ -290,7 +293,7 @@ int main()
         Draw the scene
         ****************************************
         */
-
+        /*
         ///loop through vectors and draw each coordinate
         // Clear everything from the last run frame
         window.clear();
@@ -338,6 +341,143 @@ int main()
         
         
         window.display();
+    }
+
+    return 0;
+
+
+}
+*/
+
+/*
+***********************************************
+
+!!!!!    OK NOW COMES THE COOL PROJECT    !!!!!
+
+***********************************************
+*/
+
+int main()
+{
+    // Create a video mode object
+	VideoMode vm(1920, 1080);
+
+	// Create and open a window for the game
+	RenderWindow window(vm, "Chaos Arena", Style::Default);
+
+    Vector2f clicked;
+
+    bool start = false;
+
+    Vector2f center_screen;
+    center_screen.x = 1920/2;
+    center_screen.y = 1080/2;
+
+    //Creating the attack class
+    class Attack
+    {
+        public:
+        int x_goal = 0;
+        int y_goal = 0;
+        float x_diff = (x_goal - 960);
+        float y_diff = (y_goal - 540);
+        float angle = atan(y_diff/x_diff);
+        float x_true = 960;
+        float y_true = 540;
+        int x = floor(x_true);
+        int y = floor(y_true);
+        int damage = 1;
+
+    };
+
+    vector<Attack> attack_list;
+
+    //Adding the font we will use
+    Font font;
+    font.loadFromFile("fonts/KOMIKAP_.ttf");
+
+    //Configuring the instruction text
+    Text instruction_text;
+    instruction_text.setFont(font);
+    instruction_text.setString("LEFT CLICK to Shoot\nWASD to MOVE");
+    instruction_text.setCharacterSize(50);
+    instruction_text.setFillColor(Color::White);
+
+    //Configuring the point counter text
+    Text kill_count_text;
+    kill_count_text.setFont(font);
+    kill_count_text.setString("Kills: ");
+    kill_count_text.setCharacterSize(75);
+    kill_count_text.setFillColor(Color::White);
+
+    //Positioning the instruction text
+    FloatRect textRect = instruction_text.getLocalBounds();
+    instruction_text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+    instruction_text.setPosition(1920/2.0f, 1080/2.0f);
+
+    //Positioning the point counter text
+    kill_count_text.setPosition(30, 30);
+
+    //Game Loop
+    while (window.isOpen())
+	{
+
+        Event event;
+        while (window.pollEvent(event))
+		{
+            //Closing the window
+            if (event.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+            //Grabbing mouse button inputs for various commands
+			if (event.type == sf::Event::MouseButtonPressed)
+			{
+				if (event.mouseButton.button == sf::Mouse::Left)
+				{
+                    //outputting coordinates to the consol for debugging purposes
+					std::cout << "the left button was pressed" << std::endl;
+					std::cout << "mouse x: " << event.mouseButton.x << std::endl;
+					std::cout << "mouse y: " << event.mouseButton.y << std::endl;
+
+                    Attack *shot = new Attack;
+                    shot -> x_goal = event.mouseButton.x;
+                    shot -> y_goal = event.mouseButton.y;
+                    
+                    //adding attack to the attacks vector
+                    attack_list.push_back(*shot);
+                    
+
+
+                    
+                    clicked.x = event.mouseButton.x;
+					clicked.y = event.mouseButton.y;
+
+                    if(start == false)
+                    {
+                        start = true;
+                    }
+
+				}
+			}
+		}
+
+        //Giving an alternative way of closing the program
+        if (Keyboard::isKeyPressed(Keyboard::Escape))
+		{
+			window.close();
+		}
+
+        /*
+        ****************************************
+        Update the scene
+        ****************************************
+        */
+
+        if(start == true)
+        {
+
+        }
     }
 
     return 0;
