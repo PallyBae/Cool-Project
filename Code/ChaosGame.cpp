@@ -387,10 +387,19 @@ int main()
 
     //Positioning Sprites
     background_sprite.setPosition(0,0);
+
     //Positioning the Wizard
     FloatRect wizRect = wizard_sprite.getLocalBounds();
     wizard_sprite.setOrigin(wizRect.left + wizRect.width / 2.0f, wizRect.top + wizRect.height / 2.0f);
-    wizard_sprite.setPosition(1920/2.0f, 1080/2.0f);
+    bool wiz_move_up = false;
+    bool wiz_move_left = false;
+    bool wiz_move_right = false;
+    bool wiz_move_down = false;
+    float wiz_x_pos = 1920/2.0f;
+    float wiz_y_pos = 1080/2.0f;
+    int wiz_move_speed = 200;
+    wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+
     //Defining the origin of the fireball
     FloatRect fireballRect = fireball_sprite.getLocalBounds();
     fireball_sprite.setOrigin(fireballRect.left + fireballRect.width / 2.0f, fireballRect.top + fireballRect.height / 2.0f);
@@ -555,8 +564,38 @@ int main()
     //Game Loop
     while (window.isOpen())
 	{
+        
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{
+                    
+            wiz_move_up = true;
+            wiz_y_pos -= wiz_move_speed*dt.asSeconds();
+                    
+		}
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+                    
+            wiz_move_left = true;
+            wiz_x_pos -= wiz_move_speed*dt.asSeconds();
+                    
+		}
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+                    
+            wiz_move_down = true;
+            wiz_y_pos += wiz_move_speed*dt.asSeconds();
+                    
+		}
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+                    
+            wiz_move_right = true;
+            wiz_x_pos += wiz_move_speed*dt.asSeconds();
+                    
+		}
 
         Event event;
+
         while (window.pollEvent(event))
 		{
             //Closing the window
@@ -564,6 +603,7 @@ int main()
 			{
 				window.close();
 			}
+
             //Grabbing mouse button inputs for various commands
 			if (event.type == sf::Event::MouseButtonPressed)
 			{
@@ -587,7 +627,7 @@ int main()
                         start = true;
                     }
 				}
-			}
+			}   
 		}
 
         //Giving an alternative way of closing the program
@@ -616,7 +656,8 @@ int main()
             fireball.attack_manager(dt);
         }
 
-        
+        //Moving the wizard
+        wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
 
         /*
         ****************************************
