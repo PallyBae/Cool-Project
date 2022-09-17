@@ -372,11 +372,12 @@ int main()
     Vector2f center_screen;
     center_screen.x = 1920/2;
     center_screen.y = 1080/2;
+    int attack_travel_speed = 200;
 
     //Creating the attack class
     class Attack
     {
-        public:
+        
         int x_goal = 0;
         int y_goal = 0;
         float x_diff = (x_goal - 960);
@@ -388,9 +389,37 @@ int main()
         int y = floor(y_true);
         int damage = 1;
 
+        public:
+        void Attacking(int x_goal, int y_goal)
+        {
+            this->x_goal = x_goal;
+            this->y_goal = y_goal;
+        }
+        int Position_x()
+        {
+            return x;
+        }
+        int Position_y()
+        {
+            return y;
+        }
+        float in_x_true(float i)
+        {
+            this->x_true += i;
+        }
+        float in_y_true(float i)
+        {
+            this->y_true += i;
+        }
+        float ret_angle()
+        {
+            return angle;
+        }
+
     };
 
     vector<Attack> attack_list;
+    Attack fireball;
 
     //Adding the font we will use
     Font font;
@@ -418,6 +447,10 @@ int main()
     //Positioning the point counter text
     kill_count_text.setPosition(30, 30);
 
+    //Variables to Control TIME
+    Clock clock;
+    Time dt;
+
     //Game Loop
     while (window.isOpen())
 	{
@@ -439,13 +472,11 @@ int main()
 					std::cout << "the left button was pressed" << std::endl;
 					std::cout << "mouse x: " << event.mouseButton.x << std::endl;
 					std::cout << "mouse y: " << event.mouseButton.y << std::endl;
-
-                    Attack *shot = new Attack;
-                    shot -> x_goal = event.mouseButton.x;
-                    shot -> y_goal = event.mouseButton.y;
                     
+                    fireball.Attacking(event.mouseButton.x, event.mouseButton.y);
+
                     //adding attack to the attacks vector
-                    attack_list.push_back(*shot);
+                    attack_list.push_back(fireball);
                     
 
 
@@ -473,11 +504,67 @@ int main()
         Update the scene
         ****************************************
         */
+        
+        // Measure time
+        dt = clock.restart();
+
+
 
         if(start == true)
         {
-
+            for (int i = 0; i < attack_list.size() - 1; i++)
+            {
+                
+                attack_list[i].in_x_true(cos(attack_list[i].ret_angle())*attack_travel_speed*dt.asSeconds());
+                attack_list[i].in_y_true(sin(attack_list[i].ret_angle())*attack_travel_speed*dt.asSeconds());
+            }
         }
+
+        /*
+        ****************************************
+        Draw the scene
+        ****************************************
+        */
+        
+        ///loop through vectors and draw each coordinate
+        // Clear everything from the last run frame
+        
+        window.clear();
+        // Draw our game scene here
+
+        //Drawing Point Counter
+        window.draw(kill_count_text);
+
+        //Drawing Instruction Text
+        if(attack_list.size() == 0)
+        {
+            window.draw(instruction_text);
+        }
+        
+        //Drawing Attacks
+        for(int i = 1; i < 10; i++)
+        /*
+        *************************
+        It doesnt like this line (Makes it "not respond")
+        for(int i = 1; i < attack_list.size()-1; i++)
+        *************************
+        */
+        //for(int i = 1; i < attack_list.size()-1; i++)
+        {
+            RectangleShape rect(Vector2f(3,3));
+            rect.setPosition(Vector2f(200,200));
+            /*
+            *************************
+            It doesnt like this line (Makes it "Core Dump")
+            rect.setPosition(Vector2f(attack_list[i].Position_x(), attack_list[i].Position_y()));
+            *************************
+            */
+            rect.setFillColor(Color::Red);
+            window.draw(rect);
+        }
+        
+        
+        window.display();
     }
 
     return 0;
