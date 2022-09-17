@@ -372,54 +372,115 @@ int main()
     Vector2f center_screen;
     center_screen.x = 1920/2;
     center_screen.y = 1080/2;
-    int attack_travel_speed = 200;
 
     //Creating the attack class
     class Attack
     {
         
-        int x_goal = 0;
-        int y_goal = 0;
-        float x_diff = (x_goal - 960);
-        float y_diff = (y_goal - 540);
-        float angle = atan(y_diff/x_diff);
-        float x_true = 960;
-        float y_true = 540;
-        int x = floor(x_true);
-        int y = floor(y_true);
+        vector<int> x_goals;
+        vector<int> y_goals;
+        vector<float> x_diffs;
+        vector<float> y_diffs;
+        vector<float> angles;
+        vector<float> x_trues;
+        vector<float> y_trues;
+        vector<int> x_pos;
+        vector<int> y_pos;
+        vector<bool> dead_attacks;
         int damage = 1;
+        int attack_counter = 0;
+        int true_dead_attack_counter = 0;
+        int attack_travel_speed = 50;
 
         public:
-        void Attacking(int x_goal, int y_goal)
+        void attack_generator(int x_in,int y_in)
         {
-            this->x_goal = x_goal;
-            this->y_goal = y_goal;
+            x_goals.push_back(x_in);
+            y_goals.push_back(y_in);
+            x_diffs.push_back(x_goals[attack_counter]-960);
+            y_diffs.push_back(y_goals[attack_counter]-540);
+            angles.push_back(atan(y_diffs[attack_counter]/x_diffs[attack_counter]));
+            x_trues.push_back(960);
+            y_trues.push_back(540);
+            x_pos.push_back(floor(x_trues[attack_counter]));
+            y_pos.push_back(floor(y_trues[attack_counter]));
+            dead_attacks.push_back(false);
+
+            attack_counter += 1;
+
         }
-        int Position_x()
+        void attack_manager(Time dt)
         {
-            return x;
+            
+            for (int i = true_dead_attack_counter; i < attack_counter; i++)
+            {
+                if(dead_attacks[i] == false)
+                {
+
+                    //Attack Mover
+                    if(x_diffs[i] >= 0)
+                    {
+                        x_trues[i] += ((cos(angles[i]))*attack_travel_speed*dt.asSeconds());
+                        y_trues[i] += ((sin(angles[i]))*attack_travel_speed*dt.asSeconds());
+                    }
+
+                    else
+                    {
+                        x_trues[i] -= ((cos(angles[i]))*attack_travel_speed*dt.asSeconds());
+                        y_trues[i] -= ((sin(angles[i]))*attack_travel_speed*dt.asSeconds());
+                    }
+
+                    x_pos[i] = floor(x_trues[i]);
+                    y_pos[i] = floor(y_trues[i]);
+                
+                    //Attack Killer
+                    if(x_pos[i] > 1920 || x_pos[i] < 0 || y_pos[i] > 1080 || y_pos[i] < 0)
+                    {
+                        dead_attacks[i] = true;
+                    }
+                }
+            }
         }
-        int Position_y()
+        bool is_dead_atk(int i)
         {
-            return y;
+            return dead_attacks[i];
         }
-        float in_x_true(float i)
+        int return_atk_count()
         {
-            this->x_true += i;
+            return attack_counter;
         }
-        float in_y_true(float i)
+        int return_true_dead_atk_count()
         {
-            this->y_true += i;
+            return true_dead_attack_counter;
         }
-        float ret_angle()
+        int return_x_pos(int i)
         {
-            return angle;
+            return x_pos[i];
+        }
+        int return_y_pos(int i)
+        {
+            return y_pos[i];
         }
 
+
+        /*
+
+        ****************
+        AN IDEA I HAD
+        ****************
+
+        void attack_artist(RenderWindow win)
+        {
+            for(int i = true_dead_attack_counter; i < attack_counter; i++)
+            {
+                RectangleShape rect(Vector2f(3,3));
+                rect.setPosition(Vector2f(x_pos[i], y_pos[i]));
+                rect.setFillColor(Color::Red);
+                win.draw(rect);
+            }
+        }
+        */
     };
-
-    vector<Attack> attack_list;
-    Attack fireball;
 
     //Adding the font we will use
     Font font;
@@ -447,6 +508,9 @@ int main()
     //Positioning the point counter text
     kill_count_text.setPosition(30, 30);
 
+    //Attack Variables
+    Attack fireball;
+
     //Variables to Control TIME
     Clock clock;
     Time dt;
@@ -473,22 +537,18 @@ int main()
 					std::cout << "mouse x: " << event.mouseButton.x << std::endl;
 					std::cout << "mouse y: " << event.mouseButton.y << std::endl;
                     
-                    fireball.Attacking(event.mouseButton.x, event.mouseButton.y);
 
-                    //adding attack to the attacks vector
-                    attack_list.push_back(fireball);
-                    
-
-
-                    
                     clicked.x = event.mouseButton.x;
 					clicked.y = event.mouseButton.y;
 
+                    fireball.attack_generator(clicked.x, clicked.y);
+
+                    cout << "Shooting\n";
+                    
                     if(start == false)
                     {
                         start = true;
                     }
-
 				}
 			}
 		}
@@ -505,20 +565,21 @@ int main()
         ****************************************
         */
         
-        // Measure time
+        //Measure time
         dt = clock.restart();
+
+        //Managing Attacks
+        fireball.attack_manager(dt);
 
 
 
         if(start == true)
         {
-            for (int i = 0; i < attack_list.size() - 1; i++)
-            {
-                
-                attack_list[i].in_x_true(cos(attack_list[i].ret_angle())*attack_travel_speed*dt.asSeconds());
-                attack_list[i].in_y_true(sin(attack_list[i].ret_angle())*attack_travel_speed*dt.asSeconds());
-            }
+            //Managing Attacks
+            fireball.attack_manager(dt);
         }
+
+        
 
         /*
         ****************************************
@@ -536,31 +597,20 @@ int main()
         window.draw(kill_count_text);
 
         //Drawing Instruction Text
-        if(attack_list.size() == 0)
+        if(start == false)
         {
             window.draw(instruction_text);
         }
         
-        //Drawing Attacks
-        for(int i = 1; i < 10; i++)
-        /*
-        *************************
-        It doesnt like this line (Makes it "not respond")
-        for(int i = 1; i < attack_list.size()-1; i++)
-        *************************
-        */
-        //for(int i = 1; i < attack_list.size()-1; i++)
+        for(int i = fireball.return_true_dead_atk_count(); i < fireball.return_atk_count(); i++)
         {
-            RectangleShape rect(Vector2f(3,3));
-            rect.setPosition(Vector2f(200,200));
-            /*
-            *************************
-            It doesnt like this line (Makes it "Core Dump")
-            rect.setPosition(Vector2f(attack_list[i].Position_x(), attack_list[i].Position_y()));
-            *************************
-            */
-            rect.setFillColor(Color::Red);
-            window.draw(rect);
+            if(fireball.is_dead_atk(i) != true)
+            {
+                RectangleShape rect(Vector2f(7,7));
+                rect.setPosition(Vector2f(fireball.return_x_pos(i), fireball.return_y_pos(i)));
+                rect.setFillColor(Color::Red);
+                window.draw(rect);
+            }
         }
         
         
