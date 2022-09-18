@@ -369,6 +369,7 @@ int main()
     Texture background_texture;
     Texture wizard_texture;
     Texture wizard_face_texture;
+    Texture wizard_robe_texture;
     Texture fireball_texture;
 
     //Loading Graphics
@@ -376,18 +377,21 @@ int main()
     wizard_texture.loadFromFile("Graphics/Sprite-0008-64x-WIP-Wizard-Move_Down.png");
     wizard_face_texture.loadFromFile("Graphics/Sprite-0009-64x-WIP-Wizard-Face.png");
     fireball_texture.loadFromFile("Graphics/Sprite-0005-64x-Fireball.png");
+    wizard_robe_texture.loadFromFile("Graphics/Sprite-0010-64x-Wizard-Robe-Fancy.png");
 
     //Creating Sprites
     Sprite background_sprite;
     Sprite wizard_sprite;
     Sprite wizard_face_sprite;
     Sprite fireball_sprite;
+    Sprite wizard_robe_sprite;
 
     //Attaching Textures To Sprites
     background_sprite.setTexture(background_texture);
     wizard_sprite.setTexture(wizard_texture);
     wizard_face_sprite.setTexture(wizard_face_texture);
     fireball_sprite.setTexture(fireball_texture);
+    wizard_robe_sprite.setTexture(wizard_robe_texture);
 
     //Positioning Sprites
     background_sprite.setPosition(0,0);
@@ -395,6 +399,13 @@ int main()
     //POSITIONING PLAYER CHARACTER
     float wiz_x_pos = 1920/2.0f;
     float wiz_y_pos = 1080/2.0f;
+
+    //Positioning the wizard's robe
+    FloatRect wizRobeRect = wizard_robe_sprite.getLocalBounds();
+    wizard_robe_sprite.setOrigin(wizRobeRect.left + wizRobeRect.width / 2.0f, (wizRobeRect.top + wizRobeRect.height / 2.0f) - 110);
+    wizard_robe_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+        //Changing it's size(not now)
+    wizard_robe_sprite.setScale(0.7,0.6);
 
     //Positioning the wizard's face
     FloatRect wizFaceRect = wizard_face_sprite.getLocalBounds();
@@ -711,6 +722,7 @@ int main()
 
             wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
             wizard_face_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+            wizard_robe_sprite.setPosition(wiz_x_pos, wiz_y_pos);
 
             //Rotating the Wizard's Face
                 //Locating the cursor
@@ -745,6 +757,7 @@ int main()
         window.draw(background_sprite);
 
         //Drawing Player Character
+        window.draw(wizard_robe_sprite);
         window.draw(wizard_face_sprite);
         window.draw(wizard_sprite);
 
