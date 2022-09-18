@@ -429,31 +429,68 @@ int main()
         vector<int> x_pos;
         vector<int> y_pos;
         vector<bool> dead_attacks;
+        vector<float> originate_from_x;
+        vector<float> originate_from_y;
+        Time time_since_last_shot;
+        Time zero_time;
+        Clock cooldown;
+        float cooldown_time = 0.75;
         int damage = 1;
         int attack_counter = 0;
         int true_dead_attack_counter = 0;
-        int attack_travel_speed = 100;
+        int attack_travel_speed = 200;
 
         public:
-        void attack_generator(int x_in,int y_in)
+        void attack_generator(int x_in,int y_in, float wiz_x, float wiz_y)
         {
-            x_goals.push_back(x_in);
-            y_goals.push_back(y_in);
-            x_diffs.push_back(x_goals[attack_counter]-960);
-            y_diffs.push_back(y_goals[attack_counter]-540);
-            angles.push_back(atan(y_diffs[attack_counter]/x_diffs[attack_counter]));
-            x_trues.push_back(960);
-            y_trues.push_back(540);
-            x_pos.push_back(floor(x_trues[attack_counter]));
-            y_pos.push_back(floor(y_trues[attack_counter]));
-            dead_attacks.push_back(false);
+            if(attack_counter > 0)
+            {
+                if(time_since_last_shot.asSeconds() > cooldown_time)
+                {
+                    originate_from_x.push_back(wiz_x);
+                    originate_from_y.push_back(wiz_y);
+                    x_goals.push_back(x_in);
+                    y_goals.push_back(y_in);
+                    x_diffs.push_back(x_goals[attack_counter]- wiz_x);
+                    y_diffs.push_back(y_goals[attack_counter]- wiz_y);
+                    angles.push_back(atan(y_diffs[attack_counter]/x_diffs[attack_counter]));
+                    x_trues.push_back(wiz_x);
+                    y_trues.push_back(wiz_y);
+                    x_pos.push_back(floor(x_trues[attack_counter]));
+                    y_pos.push_back(floor(y_trues[attack_counter]));
+                    dead_attacks.push_back(false);
 
-            attack_counter += 1;
+                    attack_counter += 1;
+                    cout << time_since_last_shot.asSeconds();
+                    time_since_last_shot = zero_time;
+                }
+                else
+                {
+                    cout << "attack on cooldown";
+                }
+            }
+            else
+            {
+                originate_from_x.push_back(wiz_x);
+                originate_from_y.push_back(wiz_y);
+                x_goals.push_back(x_in);
+                y_goals.push_back(y_in);
+                x_diffs.push_back(x_goals[attack_counter]- wiz_x);
+                y_diffs.push_back(y_goals[attack_counter]- wiz_y);
+                angles.push_back(atan(y_diffs[attack_counter]/x_diffs[attack_counter]));
+                x_trues.push_back(wiz_x);
+                y_trues.push_back(wiz_y);
+                x_pos.push_back(floor(x_trues[attack_counter]));
+                y_pos.push_back(floor(y_trues[attack_counter]));
+                dead_attacks.push_back(false);
 
+                attack_counter += 1;
+            }
         }
         void attack_manager(Time dt)
         {
-            
+            time_since_last_shot += cooldown.restart();
+
             for (int i = true_dead_attack_counter; i < attack_counter; i++)
             {
                 if(dead_attacks[i] == false)
@@ -565,28 +602,28 @@ int main()
     while (window.isOpen())
 	{
         
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && start == true)
 		{
                     
             wiz_move_up = true;
             wiz_y_pos -= wiz_move_speed*dt.asSeconds();
                     
 		}
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && start == true)
 		{
                     
             wiz_move_left = true;
             wiz_x_pos -= wiz_move_speed*dt.asSeconds();
                     
 		}
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && start == true)
 		{
                     
             wiz_move_down = true;
             wiz_y_pos += wiz_move_speed*dt.asSeconds();
                     
 		}
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && start == true)
 		{
                     
             wiz_move_right = true;
@@ -617,8 +654,10 @@ int main()
 
                     clicked.x = event.mouseButton.x;
 					clicked.y = event.mouseButton.y;
-
-                    fireball.attack_generator(clicked.x, clicked.y);
+                    if(start = true)
+                    {
+                        fireball.attack_generator(clicked.x, clicked.y, wiz_x_pos, wiz_y_pos);
+                    }
 
                     cout << "Shooting\n";
                     
@@ -645,19 +684,15 @@ int main()
         //Measure time
         dt = clock.restart();
 
-        //Managing Attacks
-        fireball.attack_manager(dt);
-
 
 
         if(start == true)
         {
             //Managing Attacks
             fireball.attack_manager(dt);
+            //Moving the wizard
+            wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
         }
-
-        //Moving the wizard
-        wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
 
         /*
         ****************************************
