@@ -586,7 +586,7 @@ int main()
 
     
     //Wall Buffer
-    int wall_buffer = 100;
+    int wall_buffer = 75;
     
 
     //Positioning the point counter text
@@ -705,7 +705,7 @@ int main()
             {
                 wiz_x_pos += wiz_move_speed*dt.asSeconds();
             }
-            if(wiz_y_pos < 0 + wall_buffer)S
+            if(wiz_y_pos < 0 + wall_buffer)
             {
                 wiz_y_pos += wiz_move_speed*dt.asSeconds();
             }
