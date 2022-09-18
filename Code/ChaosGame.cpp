@@ -585,7 +585,8 @@ int main()
     instruction_text.setPosition(1920/2.0f, 1080/2.0f);
 
     
-
+    //Wall Buffer
+    int wall_buffer = 100;
     
 
     //Positioning the point counter text
@@ -691,7 +692,27 @@ int main()
             //Managing Attacks
             fireball.attack_manager(dt);
             //Moving the wizard
+
+            if(wiz_x_pos > 1920-wall_buffer)
+            {
+                wiz_x_pos -= wiz_move_speed*dt.asSeconds();
+            }
+            if(wiz_y_pos > 1080-wall_buffer)
+            {
+                wiz_y_pos -= wiz_move_speed*dt.asSeconds();
+            }
+            if(wiz_x_pos < 0 + wall_buffer)
+            {
+                wiz_x_pos += wiz_move_speed*dt.asSeconds();
+            }
+            if(wiz_y_pos < 0 + wall_buffer)S
+            {
+                wiz_y_pos += wiz_move_speed*dt.asSeconds();
+            }
+
+
             wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+
         }
 
         /*
