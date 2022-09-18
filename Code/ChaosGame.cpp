@@ -368,28 +368,28 @@ int main()
     //Creating Textures
     Texture background_texture;
     Texture wizard_texture;
-    Texture wizard_face_texture;
+    Texture wizard_weapon_texture;
     Texture wizard_robe_texture;
     Texture fireball_texture;
 
     //Loading Graphics
     background_texture.loadFromFile("Graphics/Sprite-0002-Unfinished-Pixel-Arena-1920-1080.png");
     wizard_texture.loadFromFile("Graphics/Sprite-0008-64x-WIP-Wizard-Move_Down.png");
-    wizard_face_texture.loadFromFile("Graphics/Sprite-0009-64x-WIP-Wizard-Face.png");
+    wizard_weapon_texture.loadFromFile("Graphics/Sprite-0012-64x-Floating-Crystal.png");
     fireball_texture.loadFromFile("Graphics/Sprite-0005-64x-Fireball.png");
     wizard_robe_texture.loadFromFile("Graphics/Sprite-0010-64x-Wizard-Robe-Fancy.png");
 
     //Creating Sprites
     Sprite background_sprite;
     Sprite wizard_sprite;
-    Sprite wizard_face_sprite;
+    Sprite wizard_weapon_sprite;
     Sprite fireball_sprite;
     Sprite wizard_robe_sprite;
 
     //Attaching Textures To Sprites
     background_sprite.setTexture(background_texture);
     wizard_sprite.setTexture(wizard_texture);
-    wizard_face_sprite.setTexture(wizard_face_texture);
+    wizard_weapon_sprite.setTexture(wizard_weapon_texture);
     fireball_sprite.setTexture(fireball_texture);
     wizard_robe_sprite.setTexture(wizard_robe_texture);
 
@@ -402,17 +402,17 @@ int main()
 
     //Positioning the wizard's robe
     FloatRect wizRobeRect = wizard_robe_sprite.getLocalBounds();
-    wizard_robe_sprite.setOrigin(wizRobeRect.left + wizRobeRect.width / 2.0f, (wizRobeRect.top + wizRobeRect.height / 2.0f) - 110);
+    wizard_robe_sprite.setOrigin(wizRobeRect.left + wizRobeRect.width / 2.0f, (wizRobeRect.top + wizRobeRect.height / 2.0f) - 100);
     wizard_robe_sprite.setPosition(wiz_x_pos, wiz_y_pos);
         //Changing it's size(not now)
     wizard_robe_sprite.setScale(0.7,0.6);
 
-    //Positioning the wizard's face
-    FloatRect wizFaceRect = wizard_face_sprite.getLocalBounds();
-    wizard_face_sprite.setOrigin(wizFaceRect.left + wizFaceRect.width / 2.0f, (wizFaceRect.top + wizFaceRect.height / 2.0f) - 15);
-    wizard_face_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+    //Positioning the wizard's weapon
+    FloatRect wizWeaponRect = wizard_weapon_sprite.getLocalBounds();
+    wizard_weapon_sprite.setOrigin(wizWeaponRect.left + wizWeaponRect.width / 2.0f, (wizWeaponRect.top + wizWeaponRect.height / 2.0f) - 40);
+    wizard_weapon_sprite.setPosition(wiz_x_pos, wiz_y_pos);
         //Changing it's size(not now)
-    wizard_face_sprite.setScale(1,1);
+    wizard_weapon_sprite.setScale(1,1);
 
     //Positioning the Wizard
     FloatRect wizRect = wizard_sprite.getLocalBounds();
@@ -421,7 +421,7 @@ int main()
     bool wiz_move_left = false;
     bool wiz_move_right = false;
     bool wiz_move_down = false;
-    int wiz_move_speed = 200;
+    int wiz_move_speed = 250;
     wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
         //Changing its size(not now)
     wizard_sprite.setScale(1,1);
@@ -435,8 +435,8 @@ int main()
     Mouse cursor;
     Vector2i mouse_pos;
     Vector2f mouse_char_diff;
-    float wiz_face_angle_to_cursor;
-    float wiz_face_angle_to_cursor_degrees;
+    float wiz_weapon_angle_to_cursor;
+    float wiz_weapon_angle_to_cursor_degrees;
 
     bool start = false;
 
@@ -467,7 +467,7 @@ int main()
         int damage = 1;
         int attack_counter = 0;
         int true_dead_attack_counter = 0;
-        int attack_travel_speed = 400;
+        int attack_travel_speed = 500;
 
         public:
         void attack_generator(int x_in,int y_in, float wiz_x, float wiz_y)
@@ -706,7 +706,7 @@ int main()
             {
                 wiz_x_pos -= wiz_move_speed*dt.asSeconds();
             }
-            if(wiz_y_pos > 1080-wall_buffer)
+            if(wiz_y_pos > 1080 - 50 - wall_buffer)
             {
                 wiz_y_pos -= wiz_move_speed*dt.asSeconds();
             }
@@ -714,30 +714,43 @@ int main()
             {
                 wiz_x_pos += wiz_move_speed*dt.asSeconds();
             }
-            if(wiz_y_pos < 0 + wall_buffer)
+            if(wiz_y_pos < -75 + wall_buffer)
             {
                 wiz_y_pos += wiz_move_speed*dt.asSeconds();
             }
 
 
             wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
-            wizard_face_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+            wizard_weapon_sprite.setPosition(wiz_x_pos, wiz_y_pos);
             wizard_robe_sprite.setPosition(wiz_x_pos, wiz_y_pos);
 
-            //Rotating the Wizard's Face
+            //Rotating the Wizard's Weapon
                 //Locating the cursor
-            mouse_pos = cursor.getPosition(window);
-            mouse_char_diff.x = mouse_pos.x - wiz_x_pos;
-            mouse_char_diff.y = mouse_pos.y - wiz_y_pos;
-            wiz_face_angle_to_cursor = atan(mouse_char_diff.y/mouse_char_diff.x);
-            wiz_face_angle_to_cursor_degrees = (wiz_face_angle_to_cursor/(2*3.141592653589))*360;
+
+            //NOT CURRENTLY IN USE
+            //mouse_pos = cursor.getPosition(window);
+            //mouse_char_diff.x = mouse_pos.x - wiz_x_pos;
+            //mouse_char_diff.y = mouse_pos.y - wiz_y_pos;
+            //wiz_weapon_angle_to_cursor = atan(mouse_char_diff.y/mouse_char_diff.x);
+            //wiz_weapon_angle_to_cursor_degrees = (wiz_weapon_angle_to_cursor/(2*3.141592653589))*360;
+
+            //Rotating Automatically
+            if(wiz_weapon_angle_to_cursor > 2*3.141592653589)
+            {
+                wiz_weapon_angle_to_cursor -= 2*3.141592653589;
+            }
+            wiz_weapon_angle_to_cursor += 2*dt.asSeconds();
             if(mouse_char_diff.x > 0)
             {
-                wizard_face_sprite.setRotation(wiz_face_angle_to_cursor_degrees-90);
+                wizard_weapon_sprite.setPosition(wiz_x_pos + (150)*cos(wiz_weapon_angle_to_cursor),wiz_y_pos + (150)*sin(wiz_weapon_angle_to_cursor));
+                //NOT CURRENTLY IN USE
+                //wizard_weapon_sprite.setRotation(wiz_weapon_angle_to_cursor_degrees-90);
             }
             else
             {
-                wizard_face_sprite.setRotation(wiz_face_angle_to_cursor_degrees-270);
+                wizard_weapon_sprite.setPosition(wiz_x_pos - (150)*cos(wiz_weapon_angle_to_cursor),wiz_y_pos - (150)*sin(wiz_weapon_angle_to_cursor));
+                //NOT CURRENTLY IN USE
+                //wizard_weapon_sprite.setRotation(wiz_weapon_angle_to_cursor_degrees-270);
             }
         }
 
@@ -757,9 +770,8 @@ int main()
         window.draw(background_sprite);
 
         //Drawing Player Character
+        window.draw(wizard_weapon_sprite);
         window.draw(wizard_robe_sprite);
-        window.draw(wizard_face_sprite);
-        window.draw(wizard_sprite);
 
         //Drawing Point Counter
         window.draw(kill_count_text);
@@ -778,6 +790,9 @@ int main()
                 window.draw(fireball_sprite);
             }
         }
+
+        //Wizards Hat Drawn Last
+        window.draw(wizard_sprite);
         
         
         window.display();
