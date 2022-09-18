@@ -372,7 +372,7 @@ int main()
 
     //Loading Graphics
     background_texture.loadFromFile("Graphics/Sprite-0002-Unfinished-Pixel-Arena-1920-1080.png");
-    wizard_texture.loadFromFile("Graphics/Sprite-0001-32x-Wizard-Facing-Down.png");
+    wizard_texture.loadFromFile("Graphics/Sprite-0003-64x-Wizard.png");
     fireball_texture.loadFromFile("Graphics/Sprite-0005-64x-Fireball.png");
 
     //Creating Sprites
