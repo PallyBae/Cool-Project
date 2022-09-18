@@ -368,25 +368,40 @@ int main()
     //Creating Textures
     Texture background_texture;
     Texture wizard_texture;
+    Texture wizard_face_texture;
     Texture fireball_texture;
 
     //Loading Graphics
     background_texture.loadFromFile("Graphics/Sprite-0002-Unfinished-Pixel-Arena-1920-1080.png");
-    wizard_texture.loadFromFile("Graphics/Sprite-0003-64x-Wizard.png");
+    wizard_texture.loadFromFile("Graphics/Sprite-0008-64x-WIP-Wizard-Move_Down.png");
+    wizard_face_texture.loadFromFile("Graphics/Sprite-0009-64x-WIP-Wizard-Face.png");
     fireball_texture.loadFromFile("Graphics/Sprite-0005-64x-Fireball.png");
 
     //Creating Sprites
     Sprite background_sprite;
     Sprite wizard_sprite;
+    Sprite wizard_face_sprite;
     Sprite fireball_sprite;
 
     //Attaching Textures To Sprites
     background_sprite.setTexture(background_texture);
     wizard_sprite.setTexture(wizard_texture);
+    wizard_face_sprite.setTexture(wizard_face_texture);
     fireball_sprite.setTexture(fireball_texture);
 
     //Positioning Sprites
     background_sprite.setPosition(0,0);
+
+    //POSITIONING PLAYER CHARACTER
+    float wiz_x_pos = 1920/2.0f;
+    float wiz_y_pos = 1080/2.0f;
+
+    //Positioning the wizard's face
+    FloatRect wizFaceRect = wizard_face_sprite.getLocalBounds();
+    wizard_face_sprite.setOrigin(wizFaceRect.left + wizFaceRect.width / 2.0f, (wizFaceRect.top + wizFaceRect.height / 2.0f) - 15);
+    wizard_face_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+        //Changing it's size(not now)
+    wizard_face_sprite.setScale(1,1);
 
     //Positioning the Wizard
     FloatRect wizRect = wizard_sprite.getLocalBounds();
@@ -395,25 +410,28 @@ int main()
     bool wiz_move_left = false;
     bool wiz_move_right = false;
     bool wiz_move_down = false;
-    float wiz_x_pos = 1920/2.0f;
-    float wiz_y_pos = 1080/2.0f;
     int wiz_move_speed = 200;
     wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+        //Changing its size(not now)
+    wizard_sprite.setScale(1,1);
 
     //Defining the origin of the fireball
     FloatRect fireballRect = fireball_sprite.getLocalBounds();
     fireball_sprite.setOrigin(fireballRect.left + fireballRect.width / 2.0f, fireballRect.top + fireballRect.height / 2.0f);
 
-
+    //On Mice, not men
     Vector2f clicked;
+    Mouse cursor;
+    Vector2i mouse_pos;
+    Vector2f mouse_char_diff;
+    float wiz_face_angle_to_cursor;
+    float wiz_face_angle_to_cursor_degrees;
 
     bool start = false;
 
     Vector2f center_screen;
     center_screen.x = 1920/2;
     center_screen.y = 1080/2;
-
-
 
     //Creating the attack class
     class Attack
@@ -438,7 +456,7 @@ int main()
         int damage = 1;
         int attack_counter = 0;
         int true_dead_attack_counter = 0;
-        int attack_travel_speed = 200;
+        int attack_travel_speed = 400;
 
         public:
         void attack_generator(int x_in,int y_in, float wiz_x, float wiz_y)
@@ -540,25 +558,6 @@ int main()
         {
             return y_pos[i];
         }
-
-
-        /*
-
-        ****************
-        AN IDEA I HAD
-        ****************
-
-        void attack_artist(RenderWindow win)
-        {
-            for(int i = true_dead_attack_counter; i < attack_counter; i++)
-            {
-                RectangleShape rect(Vector2f(3,3));
-                rect.setPosition(Vector2f(x_pos[i], y_pos[i]));
-                rect.setFillColor(Color::Red);
-                win.draw(rect);
-            }
-        }
-        */
     };
 
     //Adding the font we will use
@@ -641,7 +640,6 @@ int main()
 			{
 				window.close();
 			}
-
             //Grabbing mouse button inputs for various commands
 			if (event.type == sf::Event::MouseButtonPressed)
 			{
@@ -691,8 +689,8 @@ int main()
         {
             //Managing Attacks
             fireball.attack_manager(dt);
+            
             //Moving the wizard
-
             if(wiz_x_pos > 1920-wall_buffer)
             {
                 wiz_x_pos -= wiz_move_speed*dt.asSeconds();
@@ -712,7 +710,23 @@ int main()
 
 
             wizard_sprite.setPosition(wiz_x_pos, wiz_y_pos);
+            wizard_face_sprite.setPosition(wiz_x_pos, wiz_y_pos);
 
+            //Rotating the Wizard's Face
+                //Locating the cursor
+            mouse_pos = cursor.getPosition(window);
+            mouse_char_diff.x = mouse_pos.x - wiz_x_pos;
+            mouse_char_diff.y = mouse_pos.y - wiz_y_pos;
+            wiz_face_angle_to_cursor = atan(mouse_char_diff.y/mouse_char_diff.x);
+            wiz_face_angle_to_cursor_degrees = (wiz_face_angle_to_cursor/(2*3.141592653589))*360;
+            if(mouse_char_diff.x > 0)
+            {
+                wizard_face_sprite.setRotation(wiz_face_angle_to_cursor_degrees-90);
+            }
+            else
+            {
+                wizard_face_sprite.setRotation(wiz_face_angle_to_cursor_degrees-270);
+            }
         }
 
         /*
@@ -731,6 +745,7 @@ int main()
         window.draw(background_sprite);
 
         //Drawing Player Character
+        window.draw(wizard_face_sprite);
         window.draw(wizard_sprite);
 
         //Drawing Point Counter
