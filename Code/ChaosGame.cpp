@@ -826,12 +826,6 @@ int main()
         //Drawing attack timer bar
         window.draw(attackTimeBar);
         window.draw(attack_time_bar_border_sprite);
-
-        //Drawing Instruction Text
-        if(start == false)
-        {
-            window.draw(instruction_text);
-        }
         
         for(int i = fireball.return_true_dead_atk_count(); i < fireball.return_atk_count(); i++)
         {
@@ -844,6 +838,13 @@ int main()
 
         //Wizards Hat Drawn Last
         window.draw(wizard_sprite);
+
+        //Drawing Instruction Text
+        if(start == false)
+        {
+            window.draw(instruction_text);
+        }
+        
         
         
         window.display();
