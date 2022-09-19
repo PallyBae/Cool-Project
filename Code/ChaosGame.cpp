@@ -371,6 +371,7 @@ int main()
     Texture wizard_weapon_texture;
     Texture wizard_robe_texture;
     Texture fireball_texture;
+    Texture attack_time_bar_border_texture;
 
     //Loading Graphics
     background_texture.loadFromFile("Graphics/Sprite-0002-Unfinished-Pixel-Arena-1920-1080.png");
@@ -378,6 +379,7 @@ int main()
     wizard_weapon_texture.loadFromFile("Graphics/Sprite-0012-64x-Floating-Crystal.png");
     fireball_texture.loadFromFile("Graphics/Sprite-0005-64x-Fireball.png");
     wizard_robe_texture.loadFromFile("Graphics/Sprite-0010-64x-Wizard-Robe-Fancy.png");
+    attack_time_bar_border_texture.loadFromFile("Graphics/Sprite-0014-Timer-Bar.png");
 
     //Creating Sprites
     Sprite background_sprite;
@@ -385,6 +387,7 @@ int main()
     Sprite wizard_weapon_sprite;
     Sprite fireball_sprite;
     Sprite wizard_robe_sprite;
+    Sprite attack_time_bar_border_sprite;
 
     //Attaching Textures To Sprites
     background_sprite.setTexture(background_texture);
@@ -392,9 +395,11 @@ int main()
     wizard_weapon_sprite.setTexture(wizard_weapon_texture);
     fireball_sprite.setTexture(fireball_texture);
     wizard_robe_sprite.setTexture(wizard_robe_texture);
+    attack_time_bar_border_sprite.setTexture(attack_time_bar_border_texture);
 
     //Positioning Sprites
     background_sprite.setPosition(0,0);
+    attack_time_bar_border_sprite.setPosition(1920 - 290, 0 + 78);
 
     //POSITIONING PLAYER CHARACTER
     float wiz_x_pos = 1920/2.0f;
@@ -630,11 +635,11 @@ int main()
 
     //Making attack timer bar
     RectangleShape attackTimeBar;
-    float attackTimeBarStartWidth = 128;
-    float attackTimeBarStartHeight = 20;
+    float attackTimeBarStartWidth = 130;
+    float attackTimeBarStartHeight = 24;
     attackTimeBar.setSize(Vector2f(attackTimeBarStartWidth, attackTimeBarStartHeight));
     attackTimeBar.setFillColor(Color::Red);
-    attackTimeBar.setPosition(1920 - 130 - attackTimeBarStartWidth, 0 + 80 + attackTimeBarStartHeight);
+    attackTimeBar.setPosition(1920 - 128 - attackTimeBarStartWidth, 0 + 76 + attackTimeBarStartHeight);
     float attackTimeBarWidthPerSecond = attackTimeBarStartWidth / fireball.return_total_cooldown();
 
     //Game Loop
@@ -728,6 +733,10 @@ int main()
         {
             attackTimeBar.setSize(Vector2f(attackTimeBarWidthPerSecond*(fireball.return_time_since_last_shot()), attackTimeBarStartHeight));
         }
+        else
+        {
+            attackTimeBar.setSize(Vector2f(attackTimeBarStartWidth, attackTimeBarStartHeight));
+        }
 
 
 
@@ -816,6 +825,7 @@ int main()
 
         //Drawing attack timer bar
         window.draw(attackTimeBar);
+        window.draw(attack_time_bar_border_sprite);
 
         //Drawing Instruction Text
         if(start == false)
