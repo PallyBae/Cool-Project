@@ -549,6 +549,14 @@ int main()
                 }
             }
         }
+        float return_time_since_last_shot()
+        {
+            return time_since_last_shot.asSeconds();
+        }
+        float return_total_cooldown()
+        {
+            return cooldown_time;
+        }
         bool is_dead_atk(int i)
         {
             return dead_attacks[i];
@@ -575,6 +583,13 @@ int main()
     Font font;
     font.loadFromFile("fonts/KOMIKAP_.ttf");
 
+    //Configuring attack timer label
+    Text attack_timer_text;
+    attack_timer_text.setFont(font);
+    attack_timer_text.setString("Fireball Charge");
+    attack_timer_text.setCharacterSize(20);
+    attack_timer_text.setFillColor(Color::White);
+
     //Configuring the instruction text
     Text instruction_text;
     instruction_text.setFont(font);
@@ -589,18 +604,22 @@ int main()
     kill_count_text.setCharacterSize(75);
     kill_count_text.setFillColor(Color::White);
 
+    //Positioning the attack timer label
+    FloatRect attackTimerRect = attack_timer_text.getLocalBounds();
+    attack_timer_text.setOrigin(attackTimerRect.left + attackTimerRect.width / 2.0f, attackTimerRect.top + attackTimerRect.height / 2.0f);
+    attack_timer_text.setPosition(1920 - ((attackTimerRect.width / 2.0f) + 100), 0 + ((attackTimerRect.height / 2.0f) + 60));
+
     //Positioning the instruction text
     FloatRect textRect = instruction_text.getLocalBounds();
     instruction_text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
     instruction_text.setPosition(1920/2.0f, 1080/2.0f);
 
     
-    //Wall Buffer
-    int wall_buffer = 75;
-    
-
     //Positioning the point counter text
     kill_count_text.setPosition(30, 30);
+
+    //Wall Buffer
+    int wall_buffer = 75;
 
     //Attack Variables
     Attack fireball;
@@ -608,6 +627,15 @@ int main()
     //Variables to Control TIME
     Clock clock;
     Time dt;
+
+    //Making attack timer bar
+    RectangleShape attackTimeBar;
+    float attackTimeBarStartWidth = 128;
+    float attackTimeBarStartHeight = 20;
+    attackTimeBar.setSize(Vector2f(attackTimeBarStartWidth, attackTimeBarStartHeight));
+    attackTimeBar.setFillColor(Color::Red);
+    attackTimeBar.setPosition(1920 - 130 - attackTimeBarStartWidth, 0 + 80 + attackTimeBarStartHeight);
+    float attackTimeBarWidthPerSecond = attackTimeBarStartWidth / fireball.return_total_cooldown();
 
     //Game Loop
     while (window.isOpen())
@@ -667,6 +695,7 @@ int main()
                     if(start = true)
                     {
                         fireball.attack_generator(clicked.x, clicked.y, wiz_x_pos, wiz_y_pos);
+                        
                     }
 
                     cout << "Shooting\n";
@@ -693,6 +722,12 @@ int main()
         
         //Measure time
         dt = clock.restart();
+
+        //Refreshing attack time bar
+        if(fireball.return_time_since_last_shot() < fireball.return_total_cooldown())
+        {
+            attackTimeBar.setSize(Vector2f(attackTimeBarWidthPerSecond*(fireball.return_time_since_last_shot()), attackTimeBarStartHeight));
+        }
 
 
 
@@ -775,6 +810,12 @@ int main()
 
         //Drawing Point Counter
         window.draw(kill_count_text);
+
+        //Drawing attack timer label
+        window.draw(attack_timer_text);
+
+        //Drawing attack timer bar
+        window.draw(attackTimeBar);
 
         //Drawing Instruction Text
         if(start == false)
