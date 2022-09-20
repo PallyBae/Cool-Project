@@ -647,10 +647,12 @@ int main()
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         *******************************************************************************************************************
         */
-        void generate_enemy(string name,int wiz_x_pos,int wiz_y_pos)
+        void generate_enemy(int wiz_x_pos,int wiz_y_pos)
         {
-            if(name == "Target Dummy")
+            enemy_name.push_back("Target Dummy");
+            if(enemy_name[enemy_counter] == "Target Dummy")
             {
+                cout << "step 1";
                 //Determining if the enemy will be elite
                 srand(time(0) + randomization_counter);
                 if(rand() % 10 == 9)
@@ -662,9 +664,12 @@ int main()
                     elite_status.push_back(false);
                 }
 
+                cout << "step 2";
+
                 //Setting enemy name, health, alive status, travel speed and max health also hitbox size
                 enemy_travel_speed.push_back(50);
-                enemy_name.push_back(name);
+                //Not right now
+                //enemy_name.push_back(name);
                 alive.push_back(true);
                 hitbox.push_back(25);
                 if(elite_status[enemy_counter] == false)
@@ -678,11 +683,15 @@ int main()
                     current_health.push_back(max_health[enemy_counter]);
                 }
 
+                cout << "step 3";
+
                 //Randomly Generating the starting position so it doesnt overlap the player or end up outside the walls
                 srand(time(0));
                 randomization_counter = 0;
                 x_pos.push_back(generation_buffer + (rand() % 1920 - 2*generation_buffer));
                 y_pos.push_back(generation_buffer + (rand() % 1080 - 2*generation_buffer));
+
+                cout << "step 4";
 
                 while(abs(x_pos[enemy_counter] - wiz_x_pos) <= player_generation_buffer || abs(y_pos[enemy_counter] - wiz_y_pos) <= player_generation_buffer)
                 {
@@ -696,6 +705,8 @@ int main()
                     //variable to help change the random seed each time to make sure the positions are different even if the time is effectivly the same
                     randomization_counter += 1;
                 }
+
+                cout << "step 5";
 
                 //Generating placeholder information to maintain shared vector positions
                 x_goals.push_back(wiz_x_pos);
@@ -720,6 +731,8 @@ int main()
                 }
                 angles.push_back(atan(y_diffs[enemy_counter]/x_diffs[enemy_counter]));
 
+                cout << "step 6";
+
             }
             enemy_counter += 1;
         }
@@ -728,27 +741,23 @@ int main()
             //Enemy Type Brancher
             for (int i = 0; i < enemy_counter; i++)
             {
-                //Target Dummy Branch
-                if(enemy_name[i] == "Target Dummy")
+                //Movement
+                x_goals[i] = wiz_x_pos;
+                y_goals[i] = wiz_y_pos;
+                x_diffs[i] = wiz_x_pos - x_pos[i];
+                y_diffs[i] = wiz_y_pos - y_pos[i];
+                angles[i] = (atan(y_diffs[i]/x_diffs[i]));
+                if(x_diffs[i] >= 0)
                 {
-                    //Movement
-                    x_goals[i] = wiz_x_pos;
-                    y_goals[i] = wiz_y_pos;
-                    x_diffs[i] = wiz_x_pos - x_pos[i];
-                    y_diffs[i] = wiz_y_pos - y_pos[i];
-                    angles[i] = (atan(y_diffs[i]/x_diffs[i]));
-                    if(x_diffs[i] >= 0)
-                    {
-                        face_left[i] = false;
-                        x_pos[i] += enemy_travel_speed[i]*cos(angles[i])*dt.asSeconds();
-                        y_pos[i] += enemy_travel_speed[i]*sin(angles[i])*dt.asSeconds();
-                    }
-                    else
-                    {
-                        face_left[i] = true;
-                        x_pos[i] -= enemy_travel_speed[i]*cos(angles[i])*dt.asSeconds();
-                        y_pos[i] -= enemy_travel_speed[i]*sin(angles[i])*dt.asSeconds();
-                    }
+                    face_left[i] = false;
+                    x_pos[i] += enemy_travel_speed[i]*cos(angles[i])*dt.asSeconds();
+                    y_pos[i] += enemy_travel_speed[i]*sin(angles[i])*dt.asSeconds();
+                }
+                else
+                {
+                    face_left[i] = true;
+                    x_pos[i] -= enemy_travel_speed[i]*cos(angles[i])*dt.asSeconds();
+                    y_pos[i] -= enemy_travel_speed[i]*sin(angles[i])*dt.asSeconds();
                 }
             }
         }
@@ -978,7 +987,7 @@ int main()
             time_collector += dt.asSeconds();
             if(time_collector >= 5)
             {
-                enemy.generate_enemy("Training Dummy", wiz_x_pos, wiz_y_pos);
+                enemy.generate_enemy(wiz_x_pos, wiz_y_pos);
                 time_collector = 0;
             }
 
@@ -1076,19 +1085,13 @@ int main()
             {
                 if(enemy.return_face_left(i) == true)
                 {
-                    if(enemy.return_name(i) == "Training Dummy")
-                    {
-                        target_dummy_left_sprite.setPosition(Vector2f(enemy.return_x_pos(i), enemy.return_y_pos(i)));
-                        window.draw(target_dummy_left_sprite);
-                    }
+                    target_dummy_left_sprite.setPosition(Vector2f(enemy.return_x_pos(i), enemy.return_y_pos(i)));
+                    window.draw(target_dummy_left_sprite);
                 }
                 else
                 {
-                    if(enemy.return_name(i) == "Training Dummy")
-                    {
                         target_dummy_right_sprite.setPosition(Vector2f(enemy.return_x_pos(i), enemy.return_y_pos(i)));
                         window.draw(target_dummy_right_sprite);
-                    }
                 }
             }
         }
