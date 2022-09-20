@@ -372,6 +372,8 @@ int main()
     Texture wizard_robe_texture;
     Texture fireball_texture;
     Texture attack_time_bar_border_texture;
+    Texture target_dummy_right_texture;
+    Texture target_dummy_left_texture;
 
     //Loading Graphics
     background_texture.loadFromFile("Graphics/Sprite-0002-Unfinished-Pixel-Arena-1920-1080.png");
@@ -380,6 +382,8 @@ int main()
     fireball_texture.loadFromFile("Graphics/Sprite-0005-64x-Fireball.png");
     wizard_robe_texture.loadFromFile("Graphics/Sprite-0010-64x-Wizard-Robe-Fancy.png");
     attack_time_bar_border_texture.loadFromFile("Graphics/Sprite-0014-Timer-Bar.png");
+    target_dummy_right_texture.loadFromFile("Graphics/Sprite-0016-Target-Dummy-Looking-Right.png");
+    target_dummy_left_texture.loadFromFile("Graphics/Sprite-0015-Target-Dummy-Looking-Left.png");
 
     //Creating Sprites
     Sprite background_sprite;
@@ -388,6 +392,8 @@ int main()
     Sprite fireball_sprite;
     Sprite wizard_robe_sprite;
     Sprite attack_time_bar_border_sprite;
+    Sprite target_dummy_right_sprite;
+    Sprite target_dummy_left_sprite;
 
     //Attaching Textures To Sprites
     background_sprite.setTexture(background_texture);
@@ -396,6 +402,8 @@ int main()
     fireball_sprite.setTexture(fireball_texture);
     wizard_robe_sprite.setTexture(wizard_robe_texture);
     attack_time_bar_border_sprite.setTexture(attack_time_bar_border_texture);
+    target_dummy_right_sprite.setTexture(target_dummy_right_texture);
+    target_dummy_left_sprite.setTexture(target_dummy_left_texture);
 
     //Positioning Sprites
     background_sprite.setPosition(0,0);
@@ -570,9 +578,225 @@ int main()
         {
             return attack_counter;
         }
-        int return_true_dead_atk_count()
+        int return_true_dead()
         {
             return true_dead_attack_counter;
+        }
+        int return_x_pos(int i)
+        {
+            return x_pos[i];
+        }
+        int return_y_pos(int i)
+        {
+            return y_pos[i];
+        }
+        bool return_dead_attacks(int i)
+        {
+            return dead_attacks[i];
+        }
+        void kill_attack(int i)
+        {
+            dead_attacks[i] = true;
+        }
+        int return_damage()
+        {
+            return damage;
+        }
+    };
+
+    //Creating the enemy class
+    class Enemy
+    {
+        vector<string> enemy_name;
+        vector<int> x_goals;
+        vector<int> y_goals;
+        vector<float> x_diffs;
+        vector<float> y_diffs;
+        vector<int> x_pos;
+        vector<int> y_pos;
+        vector<int> current_health;
+        vector<bool> elite_status;
+        vector<int> max_health;
+        vector<float> angles;
+        vector<bool> alive;
+        vector<bool> face_left;
+        vector<float> size_scale_factor;
+        vector<int> enemy_travel_speed;
+        vector<int> hitbox;
+        int enemy_counter = 0;
+        int generation_buffer = 50;
+        int player_generation_buffer = 200;
+        int randomization_counter = 0;
+        int enemies_dead = 0;
+        public:
+        //Generates an enemy
+        /*
+        *******************************************************************************************************************
+        VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+        *******************************************************************************************************************
+
+                                                        ENEMY GENERATOR IS
+
+                                                        CURENTLY BROKEN
+                                                        
+                                                        (CORE DUMP)
+
+                                                        PLEASE FIX
+
+        *******************************************************************************************************************
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        *******************************************************************************************************************
+        */
+        void generate_enemy(string name,int wiz_x_pos,int wiz_y_pos)
+        {
+            if(name == "Target Dummy")
+            {
+                //Determining if the enemy will be elite
+                srand(time(0) + randomization_counter);
+                if(rand() % 10 == 9)
+                {
+                    elite_status.push_back(true);
+                }
+                else
+                {
+                    elite_status.push_back(false);
+                }
+
+                //Setting enemy name, health, alive status, travel speed and max health also hitbox size
+                enemy_travel_speed.push_back(50);
+                enemy_name.push_back(name);
+                alive.push_back(true);
+                hitbox.push_back(25);
+                if(elite_status[enemy_counter] == false)
+                {
+                    max_health.push_back(25);
+                    current_health.push_back(max_health[enemy_counter]);
+                }
+                else
+                {
+                    max_health.push_back(5);
+                    current_health.push_back(max_health[enemy_counter]);
+                }
+
+                //Randomly Generating the starting position so it doesnt overlap the player or end up outside the walls
+                srand(time(0));
+                randomization_counter = 0;
+                x_pos.push_back(generation_buffer + (rand() % 1920 - 2*generation_buffer));
+                y_pos.push_back(generation_buffer + (rand() % 1080 - 2*generation_buffer));
+
+                while(abs(x_pos[enemy_counter] - wiz_x_pos) <= player_generation_buffer || abs(y_pos[enemy_counter] - wiz_y_pos) <= player_generation_buffer)
+                {
+                    srand(time(0) + randomization_counter);
+
+                    x_pos.erase(x_pos.end() - 1);
+                    y_pos.erase(y_pos.end() - 1);
+                    x_pos.push_back(generation_buffer + (rand() % 1920 - 2*generation_buffer));
+                    y_pos.push_back(generation_buffer + (rand() % 1080 - 2*generation_buffer));
+
+                    //variable to help change the random seed each time to make sure the positions are different even if the time is effectivly the same
+                    randomization_counter += 1;
+                }
+
+                //Generating placeholder information to maintain shared vector positions
+                x_goals.push_back(wiz_x_pos);
+                y_goals.push_back(wiz_y_pos);
+                x_diffs.push_back(wiz_x_pos - x_pos[enemy_counter]);
+                y_diffs.push_back(wiz_y_pos - y_pos[enemy_counter]);
+                if(x_diffs[enemy_counter] > 0)
+                {
+                    face_left.push_back(false);
+                }
+                else
+                {
+                    face_left.push_back(true);
+                }
+                if(elite_status[enemy_counter] = true)
+                {
+                    size_scale_factor.push_back(1.5);
+                }
+                else
+                {
+                    size_scale_factor.push_back(1.0f);
+                }
+                angles.push_back(atan(y_diffs[enemy_counter]/x_diffs[enemy_counter]));
+
+            }
+            enemy_counter += 1;
+        }
+        void enemy_movement_manager(int wiz_x_pos,int wiz_y_pos, Time dt)
+        {
+            //Enemy Type Brancher
+            for (int i = 0; i < enemy_counter; i++)
+            {
+                //Target Dummy Branch
+                if(enemy_name[i] == "Target Dummy")
+                {
+                    //Movement
+                    x_goals[i] = wiz_x_pos;
+                    y_goals[i] = wiz_y_pos;
+                    x_diffs[i] = wiz_x_pos - x_pos[i];
+                    y_diffs[i] = wiz_y_pos - y_pos[i];
+                    angles[i] = (atan(y_diffs[i]/x_diffs[i]));
+                    if(x_diffs[i] >= 0)
+                    {
+                        face_left[i] = false;
+                        x_pos[i] += enemy_travel_speed[i]*cos(angles[i])*dt.asSeconds();
+                        y_pos[i] += enemy_travel_speed[i]*sin(angles[i])*dt.asSeconds();
+                    }
+                    else
+                    {
+                        face_left[i] = true;
+                        x_pos[i] -= enemy_travel_speed[i]*cos(angles[i])*dt.asSeconds();
+                        y_pos[i] -= enemy_travel_speed[i]*sin(angles[i])*dt.asSeconds();
+                    }
+                }
+            }
+        }
+        void enemy_damage_manager(Attack attack)
+        {
+            //Taking Damage and dying
+            for(int i = 0; i < enemy_counter; i++)
+            {
+                if(alive[i] == true)
+                {
+                    for(int j = attack.return_true_dead(); j < attack.return_atk_count(); j++)
+                    {
+                        if(attack.return_dead_attacks(j) == false)
+                        {
+                            if(abs(x_pos[i] - attack.return_x_pos(j)) < hitbox[i] || abs(y_pos[i] - attack.return_y_pos(j)) < hitbox[i])
+                            {
+                                attack.kill_attack(j);
+                                current_health[i] -= attack.return_damage();
+                                if(current_health[i] <= 0)
+                                {
+                                    alive[i] = false;
+                                    enemies_dead += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int return_enemy_count()
+        {
+            return enemy_counter;
+        }
+        int return_true_dead()
+        {
+            return enemies_dead;
+        }
+        bool return_alive(int i)
+        {
+            return alive[i];
+        }
+        bool return_face_left(int i)
+        {
+            return face_left[i];
+        }
+        string return_name(int i)
+        {
+            return enemy_name[i];
         }
         int return_x_pos(int i)
         {
@@ -629,9 +853,13 @@ int main()
     //Attack Variables
     Attack fireball;
 
+    //Enemy Variables
+    Enemy enemy;
+
     //Variables to Control TIME
     Clock clock;
     Time dt;
+    float time_collector;
 
     //Making attack timer bar
     RectangleShape attackTimeBar;
@@ -742,8 +970,22 @@ int main()
 
         if(start == true)
         {
+
             //Managing Attacks
             fireball.attack_manager(dt);
+
+            //Creating a timer that resets every 5 sec
+            time_collector += dt.asSeconds();
+            if(time_collector >= 5)
+            {
+                enemy.generate_enemy("Training Dummy", wiz_x_pos, wiz_y_pos);
+                time_collector = 0;
+            }
+
+            //Managing Enemies
+            enemy.enemy_movement_manager(wiz_x_pos, wiz_y_pos, dt);
+            enemy.enemy_damage_manager(fireball);
+
             
             //Moving the wizard
             if(wiz_x_pos > 1920-wall_buffer)
@@ -826,8 +1068,33 @@ int main()
         //Drawing attack timer bar
         window.draw(attackTimeBar);
         window.draw(attack_time_bar_border_sprite);
-        
-        for(int i = fireball.return_true_dead_atk_count(); i < fireball.return_atk_count(); i++)
+
+        //Drawing enemies
+        for(int i = enemy.return_true_dead(); i < enemy.return_enemy_count(); i++)
+        {
+            if(enemy.return_alive(i) == true)
+            {
+                if(enemy.return_face_left(i) == true)
+                {
+                    if(enemy.return_name(i) == "Training Dummy")
+                    {
+                        target_dummy_left_sprite.setPosition(Vector2f(enemy.return_x_pos(i), enemy.return_y_pos(i)));
+                        window.draw(target_dummy_left_sprite);
+                    }
+                }
+                else
+                {
+                    if(enemy.return_name(i) == "Training Dummy")
+                    {
+                        target_dummy_right_sprite.setPosition(Vector2f(enemy.return_x_pos(i), enemy.return_y_pos(i)));
+                        window.draw(target_dummy_right_sprite);
+                    }
+                }
+            }
+        }
+
+        //Drawing Attacks
+        for(int i = fireball.return_true_dead(); i < fireball.return_atk_count(); i++)
         {
             if(fireball.is_dead_atk(i) != true)
             {
