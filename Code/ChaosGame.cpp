@@ -590,10 +590,6 @@ int main()
         {
             return y_pos[i];
         }
-        bool return_dead_attacks(int i)
-        {
-            return dead_attacks[i];
-        }
         void kill_attack(int i)
         {
             dead_attacks[i] = true;
@@ -667,11 +663,11 @@ int main()
                 cout << "step 2";
 
                 //Setting enemy name, health, alive status, travel speed and max health also hitbox size
-                enemy_travel_speed.push_back(50);
+                enemy_travel_speed.push_back(150);
                 //Not right now
                 //enemy_name.push_back(name);
                 alive.push_back(true);
-                hitbox.push_back(25);
+                hitbox.push_back(1000);
                 if(elite_status[enemy_counter] == false)
                 {
                     max_health.push_back(25);
@@ -770,11 +766,15 @@ int main()
                 {
                     for(int j = attack.return_true_dead(); j < attack.return_atk_count(); j++)
                     {
-                        if(attack.return_dead_attacks(j) == false)
+                        if(attack.is_dead_atk(j) != true)
                         {
                             if(abs(x_pos[i] - attack.return_x_pos(j)) < hitbox[i] || abs(y_pos[i] - attack.return_y_pos(j)) < hitbox[i])
                             {
                                 attack.kill_attack(j);
+                                if (attack.is_dead_atk(j) == true)
+                                {
+                                    cout << "IT WORKS!!!";
+                                }
                                 current_health[i] -= attack.return_damage();
                                 if(current_health[i] <= 0)
                                 {
